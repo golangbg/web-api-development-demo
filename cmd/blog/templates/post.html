@@ -1,0 +1,13 @@
+{{ define "content" }}
+<div class="row">
+    <div class="col-md-12 blog-main">
+        <div class="blog-post">
+            <h2 class="blog-post-title">{{ .Post.Title }}</h2>
+            <p class="blog-post-meta">Posted on {{ .Post.Created.Format "02.01.2006 15:04:05" }} by <a href="#">{{ .Post.Author }}</a></p>
+            {{ .Post.Body }}                
+        </div><!-- /.blog-post -->
+        
+    </div><!-- /.blog-main -->
+</div><!-- /.row -->
+    
+{{ end }}

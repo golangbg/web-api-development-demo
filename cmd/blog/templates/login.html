@@ -1,0 +1,30 @@
+{{ define "content" }}
+<div class="row">
+    {{ range $flash := .Flashes }}
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            <strong>Error</strong> {{ $flash }}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    {{ end }}
+
+    <div class="col-md-12 blog-main">
+        <form method="POST">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" class="form-control" id="username" name="username" placeholder="Enter your username" value="{{ .CurrentUser.Username}}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" class="form-control" id="password" name="password"  placeholder="Enter your password">
+            </div>
+          
+            <button type="submit" class="btn btn-primary">Login</button>
+        </form>
+        
+    </div><!-- /.blog-main -->
+</div><!-- /.row -->
+    
+{{ end }}
