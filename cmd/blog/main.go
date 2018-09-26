@@ -58,6 +58,6 @@ func main() {
 	}
 
 	log.Print("shutting down...")
-	srv.Shutdown()
+	srv.Close()
 	log.Print("done shutting down")
 }

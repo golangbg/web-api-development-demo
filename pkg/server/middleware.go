@@ -12,7 +12,7 @@ func (s *Server) ReqAuth(next http.HandlerFunc) http.HandlerFunc {
 		// Get the session
 		session, err := s.store.Get(r, SessionName)
 		if err != nil {
-			http.Redirect(w, r, "/", http.StatusFound)
+			http.Redirect(w, r, "/", http.StatusSeeOther)
 			return
 		}
 
@@ -20,14 +20,14 @@ func (s *Server) ReqAuth(next http.HandlerFunc) http.HandlerFunc {
 		au, ok := session.Values["activeUser"]
 		if !ok {
 			// We didn't get an active user, so nobody is logged in
-			http.Redirect(w, r, "/", http.StatusFound)
+			http.Redirect(w, r, "/", http.StatusSeeOther)
 			return
 		}
 
 		// Check if this is a valid user
 		if _, err := s.db.GetUserByUsername(au.(string)); err != nil {
 			// We didn't get a valid user from the db, so we'll deny access
-			http.Redirect(w, r, "/", http.StatusFound)
+			http.Redirect(w, r, "/", http.StatusSeeOther)
 			return
 		}
 

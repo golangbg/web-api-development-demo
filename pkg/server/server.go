@@ -28,13 +28,13 @@ type Server struct {
 	db    *database.DB
 }
 
-// Shutdown contains all the steps for a graceful shutdown of the server
-func (s *Server) Shutdown() {
+// Close contains all the steps for a graceful shutdown of the server
+func (s *Server) Close() {
 	// Close the database
 	s.db.CloseDB()
 
 	// Shutdown the http server
-	s.Server.Shutdown(context.Background())
+	s.Shutdown(context.Background())
 }
 
 // PrepareData prepares data which is to be send with flashes
