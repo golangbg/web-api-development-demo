@@ -9,7 +9,7 @@ import (
 	"github.com/gorilla/mux"
 	"golang.org/x/crypto/bcrypt"
 
-	"github.com/golangbg/web-api-development/pkg/models"
+	"github.com/golangbg/web-api-development-demo/pkg/models"
 )
 
 // answer send a json formatted answer to the ResponseWriter

@@ -1,7 +1,7 @@
 package database
 
 import (
-	"github.com/golangbg/web-api-development/pkg/models"
+	"github.com/golangbg/web-api-development-demo/pkg/models"
 	"golang.org/x/crypto/bcrypt"
 )
 

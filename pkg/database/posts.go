@@ -3,7 +3,7 @@ package database
 import (
 	"time"
 
-	"github.com/golangbg/web-api-development/pkg/models"
+	"github.com/golangbg/web-api-development-demo/pkg/models"
 )
 
 // SavePost saves a post to the database

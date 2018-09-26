@@ -8,8 +8,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/golangbg/web-api-development/pkg/database"
-	"github.com/golangbg/web-api-development/pkg/models"
+	"github.com/golangbg/web-api-development-demo/pkg/database"
+	"github.com/golangbg/web-api-development-demo/pkg/models"
 	"github.com/gorilla/sessions"
 )
 

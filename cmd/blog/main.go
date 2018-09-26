@@ -6,7 +6,7 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/golangbg/web-api-development/pkg/server"
+	"github.com/golangbg/web-api-development-demo/pkg/server"
 )
 
 func main() {
