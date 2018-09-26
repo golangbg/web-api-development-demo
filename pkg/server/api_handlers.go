@@ -3,7 +3,6 @@ package server
 import (
 	"database/sql"
 	"encoding/json"
-	"log"
 	"net/http"
 	"time"
 
@@ -64,7 +63,7 @@ func (s *Server) postCreateUpdateAPIHandler(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	// Set the user ID
+	// Set the user ID, because the request doesn't contain this field
 	req.UserID = user.ID
 
 	// Perform validation
@@ -145,7 +144,6 @@ func (s *Server) userAuthenticateAPIHandler(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	log.Println(req)
 	// Get the user from the database
 	user, err := s.db.GetUserByUsername(req.Username)
 	if err != nil {

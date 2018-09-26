@@ -6,6 +6,7 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"sync"
 
 	"golang.org/x/crypto/bcrypt"
 
@@ -52,9 +53,29 @@ func (s *Server) rootHandler(files ...string) http.HandlerFunc {
 
 // postReadHandler gets and displays a single post
 func (s *Server) postReadHandler(files ...string) http.HandlerFunc {
-	tpl := template.Must(template.New("").ParseFiles(files...))
+	log.Println("postReadHandler initialization")
+
+	// sync.Once allows to defer expensive transactions until the first time the handlerFunc is called
+	// also this will allow to reply with a decent error instead of panicing
+	// https://golang.org/pkg/sync/#Once.Do
+	var (
+		init sync.Once
+		tpl  *template.Template
+		err  error
+	)
 
 	return func(w http.ResponseWriter, r *http.Request) {
+		log.Println("postReadHandler HandlerFunc")
+
+		// Execute initialization transactions only once
+		init.Do(func() {
+			log.Println("postReadHandler init.Do")
+			tpl, err = template.New("").ParseFiles(files...)
+		})
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
 		args := mux.Vars(r)
 
 		post, err := s.db.GetPostBySlug(args["slug"])
@@ -87,9 +108,22 @@ func (s *Server) postReadHandler(files ...string) http.HandlerFunc {
 
 // postCreateHandler renders and displays a form for creating a new post
 func (s *Server) postCreateHandler(files ...string) http.HandlerFunc {
-	tpl := template.Must(template.New("").ParseFiles(files...))
+	var (
+		init sync.Once
+		tpl  *template.Template
+		err  error
+	)
 
 	return func(w http.ResponseWriter, r *http.Request) {
+		// Execute initialization transactions only once
+		init.Do(func() {
+			tpl, err = template.New("").ParseFiles(files...)
+		})
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
 		data := make(map[string]interface{})
 
 		// Get the session
@@ -184,9 +218,22 @@ func (s *Server) postSaveHandler(w http.ResponseWriter, r *http.Request) {
 
 // userCreateHandler renders and displays a form for creating a new user
 func (s *Server) userCreateHandler(files ...string) http.HandlerFunc {
-	tpl := template.Must(template.New("").ParseFiles(files...))
+	var (
+		init sync.Once
+		tpl  *template.Template
+		err  error
+	)
 
 	return func(w http.ResponseWriter, r *http.Request) {
+		// Execute initialization transactions only once
+		init.Do(func() {
+			tpl, err = template.New("").ParseFiles(files...)
+		})
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
 		data := make(map[string]interface{})
 
 		// Get the session
@@ -280,11 +327,23 @@ func (s *Server) userSaveHandler(w http.ResponseWriter, r *http.Request) {
 
 // userLoginHandler renders and displays a form for logging in
 func (s *Server) userLoginHandler(files ...string) http.HandlerFunc {
-	tpl := template.Must(template.New("").ParseFiles(files...))
+	var (
+		init sync.Once
+		tpl  *template.Template
+		err  error
+	)
 
 	return func(w http.ResponseWriter, r *http.Request) {
-		data := make(map[string]interface{})
+		// Execute initialization transactions only once
+		init.Do(func() {
+			tpl, err = template.New("").ParseFiles(files...)
+		})
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
 
+		data := make(map[string]interface{})
 		// Prepare data
 		s.PrepareData(w, r, data)
 
@@ -298,6 +357,7 @@ func (s *Server) userLoginHandler(files ...string) http.HandlerFunc {
 	}
 }
 
+// userAuthenticateHandler handles user authentication
 func (s *Server) userAuthenticateHandler(w http.ResponseWriter, r *http.Request) {
 	// Parse the HTML form
 	if err := r.ParseForm(); err != nil {
@@ -312,7 +372,9 @@ func (s *Server) userAuthenticateHandler(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	// Check if password and confirmPassword match
+	// Get the username and password from the form
+	// Here we do that manually, Gorilla offers schemas to make this job easier
+	// http://www.gorillatoolkit.org/pkg/schema
 	username := r.FormValue("username")
 	password := r.FormValue("password")
 
@@ -346,6 +408,7 @@ func (s *Server) userAuthenticateHandler(w http.ResponseWriter, r *http.Request)
 	http.Redirect(w, r, "/", http.StatusFound)
 }
 
+// userLogoutHandler logs out the current user
 func (s *Server) userLogoutHandler(w http.ResponseWriter, r *http.Request) {
 	// Get the session
 	session, err := s.store.Get(r, SessionName)
