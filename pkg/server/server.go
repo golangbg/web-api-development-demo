@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/gob"
 	"fmt"
+	"log"
 	"net/http"
 	"time"
 
@@ -30,11 +31,15 @@ type Server struct {
 
 // Close contains all the steps for a graceful shutdown of the server
 func (s *Server) Close() {
-	// Close the database
-	s.db.CloseDB()
-
 	// Shutdown the http server
-	s.Shutdown(context.Background())
+	if err := s.Shutdown(context.Background()); err != nil {
+		log.Printf("could shutdown HTTP server: %v", err)
+	}
+
+	// Close the database
+	if err := s.db.CloseDB(); err != nil {
+		log.Printf("could close DB: %v", err)
+	}
 }
 
 // PrepareData prepares data which is to be send with flashes
